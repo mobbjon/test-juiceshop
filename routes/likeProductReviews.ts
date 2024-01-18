@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import * as mongoSanitize from 'express-mongo-sanitize'
 import challengeUtils = require('../lib/challengeUtils')
 import { type Request, type Response, type NextFunction } from 'express'
 import { type Review } from '../data/types'
@@ -15,7 +16,7 @@ module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
     const id = req.body.id
     const user = security.authenticatedUsers.from(req)
-    db.reviews.findOne({ _id: id }).then((review: Review) => {
+    db.reviews.findOne({ _id: mongoSanitize.sanitize({ data: id }).data }).then((review: Review) =>   {
       if (!review) {
         res.status(404).json({ error: 'Not found' })
       } else {
